@@ -40,13 +40,6 @@ let DUMMY_PLACES = [
   }
 ]
 
-const getAllPlaces = (req, res, next) => {
-  if(!DUMMY_PLACES){
-    throw new HttpError('No placed found.', 400)
-  }
-  res.status(200).json({places: DUMMY_PLACES})
-}
-
 const getPlaceById = (req, res, next) => {
   const placeId = req.params.pid
   const place = DUMMY_PLACES.find(p => p.id === placeId)
@@ -122,6 +115,5 @@ const deletePlaceById = (req, res, next) => {
 exports.getPlaceById = getPlaceById
 exports.getPlacesByUserId = getPlacesByUserId
 exports.createPlace = createPlace
-exports.getAllPlaces = getAllPlaces
 exports.updatePlaceById = updatePlaceById
 exports.deletePlaceById = deletePlaceById
