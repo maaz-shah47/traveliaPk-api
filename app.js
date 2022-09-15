@@ -15,9 +15,10 @@ app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader(
     'Access-Control-Allow-Headers',
-    'Origin, X-Requested-With, Content-Type, Access, Authorization'
+    'Origin, X-Requested-With, Content-Type, Accept, Authorization'
   );
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE');
+
   next();
 });
 
@@ -39,11 +40,8 @@ app.use((error, req, res, next) => {
   res.status(error.status || 500);
   res.json({ message: error.message || 'An unkown error occurred!' });
 });
-
 mongoose
-  .connect(
-    'mongodb+srv://MaazShah:Maazshah0071@cluster0.rcufx.mongodb.net/travelia-pk?retryWrites=true&w=majority'
-  )
+  .connect('mongodb://localhost:27017/travelia-pk')
   .then(() => app.listen(5000))
   .catch((err) => {
     console.log(err);

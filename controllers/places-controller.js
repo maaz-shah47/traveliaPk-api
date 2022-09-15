@@ -1,10 +1,8 @@
-const { v4: uuid } = require('uuid');
 const { validationResult } = require('express-validator');
 const Place = require('../models/place');
 const User = require('../models/user');
 
 const HttpError = require('../models/http-error');
-const { default: mongoose } = require('mongoose');
 
 const getPlaceById = async (req, res, next) => {
   const placeId = req.params.pid;
@@ -45,7 +43,7 @@ const getPlacesByUserId = async (req, res, next) => {
   }
 
   res.json({
-    userPlaces: userPlaces.map((place) => place.toObject({ getters: true })),
+    places: userPlaces.map((place) => place.toObject({ getters: true })),
   });
 };
 
@@ -55,14 +53,13 @@ const createPlace = async (req, res, next) => {
   if (!errors.isEmpty()) {
     throw new HttpError('Invalid input passed, please check your data.', 422);
   }
-  const { title, description, coordinates, address, creator } = req.body;
+  const { title, description, address, creator } = req.body;
 
   const createdPlace = new Place({
     title,
     description,
-    location: coordinates,
     image:
-      'https://images.unsplash.com/photo-1581084514519-8b6b0b0b0b1c?ixid=MXwxMjA3fDB8MHxzZWFyY2h8Mnx8cGxhY2V8ZW58MHx8MHx8&ixlib=rb-1.2.1&w=1000&q=80',
+      'https://images.unsplash.com/photo-1663159338533-44fef396e139?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=976&q=80',
     address,
     creator,
   });
@@ -85,12 +82,9 @@ const createPlace = async (req, res, next) => {
   }
 
   try {
-    const sess = await mongoose.startSession();
-    sess.startTransaction();
-    await createdPlace.save({ session: sess });
+    await createdPlace.save();
     user.places.push(createdPlace);
-    await user.save({ session: sess });
-    await sess.commitTransaction();
+    await user.save();
   } catch (err) {
     const error = new HttpError('Could not create place', 500);
     return next(error);
@@ -155,12 +149,9 @@ const deletePlaceById = async (req, res, next) => {
     return next(error);
   }
   try {
-    const sess = await mongoose.startSession();
-    sess.startTransaction();
-    await place.remove({ session: sess });
+    await place.remove();
     place.creator.places.pull(place);
-    await place.creator.save({ session: sess });
-    await sess.commitTransaction();
+    await place.creator.save();
   } catch (err) {
     const error = new HttpError(
       'Something went wrong. Could not delete place',
