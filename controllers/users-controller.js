@@ -1,7 +1,5 @@
 const { v4: uuid } = require('uuid');
-
 const User = require('../models/user');
-
 const { validationResult } = require('express-validator');
 
 const HttpError = require('../models/http-error');
@@ -49,8 +47,7 @@ const signup = async (req, res, next) => {
     name,
     email,
     password,
-    image:
-      'https://images.unsplash.com/photo-1581084514519-8b6b0b0b0b1c?ixid=MXwxMjA3fDB8MHxzZWFyY2h8Mnx8cGxhY2V8ZW58MHx8MHx8&ixlib=rb-1.2.1&w=1000&q=80',
+    image: req.file.path,
     places: [],
   });
 

@@ -1,3 +1,4 @@
+const fs = require('fs');
 const { validationResult } = require('express-validator');
 const Place = require('../models/place');
 const User = require('../models/user');
@@ -55,11 +56,11 @@ const createPlace = async (req, res, next) => {
   }
   const { title, description, address, creator } = req.body;
 
+  console.log(req.file.path);
   const createdPlace = new Place({
     title,
     description,
-    image:
-      'https://images.unsplash.com/photo-1663159338533-44fef396e139?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=976&q=80',
+    image: req.file.path,
     address,
     creator,
   });
@@ -148,6 +149,8 @@ const deletePlaceById = async (req, res, next) => {
     const error = new HttpError('Could not find place with the given Id', 500);
     return next(error);
   }
+  const imagePath = place.image;
+
   try {
     await place.remove();
     place.creator.places.pull(place);
@@ -159,6 +162,8 @@ const deletePlaceById = async (req, res, next) => {
     );
     return next(error);
   }
+
+  fs.unlink(imagePath, (err) => console.log(err));
   res.status(200).json({ message: 'Place deleted successfully.' });
 };
 
