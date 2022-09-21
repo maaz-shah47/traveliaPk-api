@@ -115,6 +115,15 @@ const updatePlaceById = async (req, res, next) => {
     );
     return next(error);
   }
+
+  if (place.creator.toString() !== req.userData.userId) {
+    const error = new HttpError(
+      'You are not authorized to perform this action..',
+      401
+    );
+    return next(error);
+  }
+
   place.title = title;
   place.description = description;
 
@@ -144,11 +153,19 @@ const deletePlaceById = async (req, res, next) => {
     );
     return next(error);
   }
+  if (place.creator.id !== req.userData.userId) {
+    const error = new HttpError(
+      'You are not authorized to perform this action..',
+      401
+    );
+    return next(error);
+  }
 
   if (!place) {
     const error = new HttpError('Could not find place with the given Id', 500);
     return next(error);
   }
+
   const imagePath = place.image;
 
   try {
